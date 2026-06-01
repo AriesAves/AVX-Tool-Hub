@@ -6,3 +6,5 @@ Toast Notification System: Replaced native alert() boxes with elegant, non-intru
 Responsive Layout: The tools adapt to the screen size smoothly.
 External Integration: The Image Resizer is embedded via an iframe in the second tab, allowing you to use it without leaving the page.
 State Management: Logic added to ensure the canvas and selection coordinates update correctly when switching back and forth between tabs.
+
+https://ariesaves.github.io/AVX-Tool-Hub/
