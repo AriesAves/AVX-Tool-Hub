@@ -66,7 +66,9 @@
   .brand span { color: var(--primary); }
 
   .nav-tabs {
-    display: flex;
+    display: inline-flex;
+    justify-content: center;
+    flex-wrap: wrap;
     background: var(--bg-body);
     padding: 4px;
     border-radius: 8px;
@@ -77,6 +79,7 @@
     background: transparent;
     border: none;
     padding: 8px 16px;
+    min-width: 96px;
     border-radius: 6px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -87,6 +90,7 @@
     align-items: center;
     gap: 8px;
     white-space: nowrap;
+    justify-content: center;
   }
 
   .nav-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.5); }
@@ -390,12 +394,12 @@
 
   <!-- TAB 2: RESIZER -->
   <div id="resizer" class="tab-panel">
-    <iframe id="resizer-frame" class="external-tool-frame" src="https://ariesaves.github.io/Image-Resizer/" title="Image Resizer Tool"></iframe>
+    <iframe id="resizer-frame" class="external-tool-frame" data-src="https://ariesaves.github.io/Image-Resizer/" src="" loading="lazy" title="Image Resizer Tool"></iframe>
   </div>
 
   <!-- TAB 3: NEXUS (NEW) -->
   <div id="nexus" class="tab-panel">
-    <iframe id="nexus-frame" class="external-tool-frame" src="https://ariesaves.github.io/AVXNexus/" title="AVX Nexus Tool"></iframe>
+    <iframe id="nexus-frame" class="external-tool-frame" data-src="https://ariesaves.github.io/AVXNexus/" src="" loading="lazy" title="AVX Nexus Tool"></iframe>
   </div>
 
 </main>
@@ -441,7 +445,11 @@ function switchTab(tabId) {
 
   // Update Panels
   document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+  const selectedPanel = document.getElementById(tabId);
+  if (selectedPanel) selectedPanel.classList.add('active');
+
+  // Lazy-load iframe content when tab is clicked
+  loadTabIframe(tabId);
 
   // If switching back to cropper, ensure overlay is positioned correctly
   if (tabId === 'cropper' && imageLoaded) {
@@ -449,6 +457,15 @@ function switchTab(tabId) {
     setTimeout(() => {
       updateSelectionOverlay();
     }, 50);
+  }
+}
+
+function loadTabIframe(tabId) {
+  const iframe = document.querySelector(`#${tabId}-frame`);
+  if (!iframe || iframe.src) return;
+  const dataSrc = iframe.getAttribute('data-src');
+  if (dataSrc) {
+    iframe.src = dataSrc;
   }
 }
 

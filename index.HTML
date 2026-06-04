@@ -390,15 +390,15 @@
 
   <!-- TAB 2: RESIZER -->
   <div id="resizer" class="tab-panel">
-    <iframe id="resizer-frame" class="external-tool-frame" src="https://ariesaves.github.io/Image-Resizer/" title="Image Resizer Tool"></iframe>
+    <iframe id="resizer-frame" class="external-tool-frame" data-src="https://ariesaves.github.io/Image-Resizer/" src="" loading="lazy" title="Image Resizer Tool"></iframe>
   </div>
 
   <!-- TAB 3: NEXUS PREFLIGHT (NEW) -->
   <div id="nexus" class="tab-panel">
-    <iframe id="nexus-frame" class="external-tool-frame" src="https://ariesaves.github.io/AVXNexus/" title="AVX Nexus Tool"></iframe>
+    <iframe id="nexus-frame" class="external-tool-frame" data-src="https://ariesaves.github.io/AVXNexus/" src="" loading="lazy" title="AVX Nexus Tool"></iframe>
   </div>
 
-</main>
+</main>“},{
 
 <!-- Toast Container -->
 <div id="toast-container"></div>
@@ -443,12 +443,24 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
 
+  // Lazy-load iframe content when tab is clicked
+  loadTabIframe(tabId);
+
   // If switching back to cropper, ensure overlay is positioned correctly
   if (tabId === 'cropper' && imageLoaded) {
     // Slight delay to allow display:block to render so getBoundingClientRect works
     setTimeout(() => {
       updateSelectionOverlay();
     }, 50);
+  }
+}
+
+function loadTabIframe(tabId) {
+  const iframe = document.querySelector(`#${tabId}-frame`);
+  if (!iframe || iframe.src) return;
+  const dataSrc = iframe.getAttribute('data-src');
+  if (dataSrc) {
+    iframe.src = dataSrc;
   }
 }
 
