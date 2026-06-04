@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AVX Tool Hub | Crop, Resize & Nexus</title>
+<title>AVX Tool Hub | Cropper, Resizer, PDF Fixer & Nexus</title>
 <!-- PDF.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -42,15 +42,16 @@
 
   /* --- Header & Navigation --- */
   header {
-    height: var(--header-height);
+    min-height: var(--header-height);
     background: var(--bg-panel);
     border-bottom: 2px solid var(--border);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     z-index: 20;
+    position: relative;
     flex-shrink: 0;
   }
 
@@ -61,48 +62,55 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    position: absolute;
+    left: 24px;
   }
 
   .brand span { color: var(--primary); }
 
   .nav-tabs {
     display: flex;
-    background: transparent;
-    padding: 0;
-    border-radius: 0;
-    gap: 0;
-    border-bottom: 2px solid var(--border);
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    gap: 12px;
+    padding: 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
   }
 
   .nav-btn {
+    flex: 1;
+    min-width: 140px;
     background: transparent;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border: 1px solid transparent;
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-size: 0.98rem;
+    font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
+    transition: all 0.25s ease;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
     white-space: nowrap;
     position: relative;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
   }
 
-  .nav-btn:hover { 
-    color: var(--text-main); 
-    background: rgba(37, 99, 235, 0.05);
+  .nav-btn:hover {
+    color: var(--text-main);
+    background: rgba(37, 99, 235, 0.08);
+    transform: translateY(-1px);
   }
   
   .nav-btn.active {
-    background: transparent;
     color: var(--primary);
-    border-bottom-color: var(--primary);
-    box-shadow: none;
+    background: rgba(37, 99, 235, 0.12);
+    border-color: rgba(37, 99, 235, 0.24);
+    box-shadow: 0 12px 18px rgba(37, 99, 235, 0.12);
   }
 
   /* --- Main Layout --- */
@@ -407,9 +415,13 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
       <span>Resizer</span>
     </button>
-    <button class="nav-btn" onclick="switchTab('nexus')" title="AVX Nexus Preflight">
+    <button class="nav-btn" onclick="switchTab('pdf-fixer')" title="PDF Content Fixer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2Z"/><path d="M14 2v6h6"/><path d="M12 11h4M12 15h6M12 19h4"/></svg>
+      <span>PDF Fixer</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('nexus')" title="AVX Nexus">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-      <span>Nexus Preflight</span>
+      <span>Nexus</span>
     </button>
   </nav>
 </header>
@@ -469,7 +481,12 @@
     <iframe id="resizer-frame" class="external-tool-frame" src="https://ariesaves.github.io/Image-Resizer/" title="Image Resizer Tool"></iframe>
   </div>
 
-  <!-- TAB 3: PREFLIGHT (NEW) -->
+  <!-- TAB 3: PDF CONTENT FIXER -->
+  <div id="pdf-fixer" class="tab-panel">
+    <iframe id="pdf-fixer-frame" class="external-tool-frame" src="https://ariesaves.github.io/pdf-content-fixer-v1/" title="PDF Content Fixer Tool"></iframe>
+  </div>
+
+  <!-- TAB 4: NEXUS (NEW) -->
   <div id="nexus" class="tab-panel">
     <iframe id="nexus-frame" class="external-tool-frame" src="https://ariesaves.github.io/AVXNexus/" title="AVX Nexus Tool"></iframe>
   </div>
