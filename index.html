@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>AVX Tool Hub | Cropper, Resizer, PDF Fixer & Nexus</title>
 <!-- PDF.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -791,6 +794,11 @@ window.addEventListener('resize', () => {
   }
 });
 
+</script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/AVX-Tool-Hub/sw.js');
+  }
 </script>
 </body>
 </html>
