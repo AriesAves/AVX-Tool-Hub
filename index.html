@@ -3,30 +3,57 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0D1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>AVX Tool Hub | Cropper, Resizer, PDF Fixer & Nexus</title>
+<title>AVX Tool Hub | Professional Image & PDF Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- PDF.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- pdf-lib for vector PDF export -->
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
   :root {
     /* Professional Color Palette */
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #818cf8;
+    --primary-bg: #eef2ff;
     --secondary: #64748b;
-    --bg-body: #f1f5f9;
+    --bg-body: #f8fafc;
     --bg-panel: #ffffff;
     --text-main: #0f172a;
     --text-muted: #64748b;
+    --text-light: #94a3b8;
     --border: #e2e8f0;
+    --border-light: #f1f5f9;
     --danger: #ef4444;
-    --success: #22c55e;
+    --success: #10b981;
+    --warning: #f59e0b;
     
-    --radius-md: 12px;
-    --radius-sm: 6px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --header-height: 70px;
+    /* Tool-specific accent colors */
+    --accent-cropper: #4f46e5;
+    --accent-cropper-bg: #eef2ff;
+    --accent-resizer: #06b6d4;
+    --accent-resizer-bg: #ecfeff;
+    --accent-pdf: #ef4444;
+    --accent-pdf-bg: #fef2f2;
+    --accent-nexus: #8b5cf6;
+    --accent-nexus-bg: #f5f3ff;
+    --accent-3d: #f59e0b;
+    --accent-3d-bg: #fffbeb;
+    
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-sm: 8px;
+    --radius-xl: 28px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+    --shadow-xl: 0 20px 40px -10px rgba(15, 23, 42, 0.15), 0 8px 16px -4px rgba(15, 23, 42, 0.08);
+    --header-height: 76px;
   }
 
   * { box-sizing: border-box; }
@@ -37,105 +64,137 @@
     padding: 0;
     background: var(--bg-body);
     color: var(--text-main);
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* App-like feel */
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Decorative background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 0%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 30%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 0% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* --- Header & Navigation --- */
   header {
     min-height: var(--header-height);
-    background: var(--bg-panel);
-    border-bottom: 2px solid var(--border);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 24px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    z-index: 20;
-    position: relative;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
     flex-shrink: 0;
   }
 
   .brand {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-main);
     display: flex;
     align-items: center;
-    gap: 10px;
-    position: absolute;
-    left: 24px;
-  }
-
-  .brand span { color: var(--primary); }
-
-  .nav-tabs {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.6);
     gap: 12px;
-    padding: 8px;
-    border-radius: 999px;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    user-select: none;
   }
 
-  .nav-btn {
-    flex: 1;
-    min-width: 140px;
-    background: transparent;
-    border: 1px solid transparent;
-    padding: 14px 22px;
-    border-radius: 999px;
-    font-size: 0.98rem;
-    font-weight: 700;
+  .brand-logo {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .brand-text small {
+    font-size: 0.65rem;
     color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.25s ease;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .brand span { 
+    color: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-tag {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    white-space: nowrap;
-    position: relative;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
-  .nav-btn:hover {
-    color: var(--text-main);
-    background: rgba(37, 99, 235, 0.08);
-    transform: translateY(-1px);
+  .header-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--success);
+    animation: pulse 2s ease-in-out infinite;
   }
-  
-  .nav-btn.active {
-    color: var(--primary);
-    background: rgba(37, 99, 235, 0.12);
-    border-color: rgba(37, 99, 235, 0.24);
-    box-shadow: 0 12px 18px rgba(37, 99, 235, 0.12);
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   /* --- Main Layout --- */
   main {
     flex: 1;
     position: relative;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    padding: 24px;
+    z-index: 1;
   }
 
-  .tab-panel {
-    display: none; /* Hidden by default */
-    width: 100%;
-    max-width: 1200px;
-    height: 100%;
-    flex-direction: column;
+  .view {
+    display: none;
     animation: fadeIn 0.4s ease;
   }
 
-  .tab-panel.active { display: flex; }
+  .view.active { display: block; }
 
   @keyframes fadeIn {
     from { 
@@ -148,17 +207,441 @@
     }
   }
 
-  /* --- Tool 1: Cropper Styles --- */
-  .tool-container {
+  /* --- HOME VIEW --- */
+  .home-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    margin-bottom: 64px;
+    padding: 32px 0 16px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .hero-badge svg {
+    color: var(--primary);
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    margin: 0 0 20px;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    color: var(--text-main);
+  }
+
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* Section heading */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 4px 0 0;
+  }
+
+  /* Tool Grid */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .tool-card {
     background: var(--bg-panel);
-    border-radius: var(--radius-md);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
     display: flex;
     flex-direction: column;
-    height: 100%;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: transparent;
+  }
+
+  .tool-card-preview {
+    height: 140px;
+    position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tool-card.cropper .tool-card-preview {
+    background: linear-gradient(135deg, var(--accent-cropper-bg) 0%, #e0e7ff 100%);
+  }
+
+  .tool-card.resizer .tool-card-preview {
+    background: linear-gradient(135deg, var(--accent-resizer-bg) 0%, #cffafe 100%);
+  }
+
+  .tool-card.pdf .tool-card-preview {
+    background: linear-gradient(135deg, var(--accent-pdf-bg) 0%, #fee2e2 100%);
+  }
+
+  .tool-card.nexus .tool-card-preview {
+    background: linear-gradient(135deg, var(--accent-nexus-bg) 0%, #ede9fe 100%);
+  }
+
+  .tool-card.d3 .tool-card-preview {
+    background: linear-gradient(135deg, var(--accent-3d-bg) 0%, #fef3c7 100%);
+  }
+
+  .tool-card-preview::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%), 
+      linear-gradient(-45deg, rgba(255,255,255,0.4) 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.4) 75%), 
+      linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.4) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    opacity: 0.5;
+  }
+
+  .preview-illustration {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tool-card-body {
+    padding: 20px 22px 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .tool-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .tool-card.cropper .tool-card-icon { background: var(--accent-cropper); }
+  .tool-card.resizer .tool-card-icon { background: var(--accent-resizer); }
+  .tool-card.pdf .tool-card-icon { background: var(--accent-pdf); }
+  .tool-card.nexus .tool-card-icon { background: var(--accent-nexus); }
+  .tool-card.d3 .tool-card-icon { background: var(--accent-3d); }
+
+  .tool-card-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tool-card.cropper .tool-card-tag { background: var(--accent-cropper-bg); color: var(--accent-cropper); }
+  .tool-card.resizer .tool-card-tag { background: var(--accent-resizer-bg); color: var(--accent-resizer); }
+  .tool-card.pdf .tool-card-tag { background: var(--accent-pdf-bg); color: var(--accent-pdf); }
+  .tool-card.nexus .tool-card-tag { background: var(--accent-nexus-bg); color: var(--accent-nexus); }
+  .tool-card.d3 .tool-card-tag { background: var(--accent-3d-bg); color: var(--accent-3d); }
+
+  .tool-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+  }
+
+  .tool-card-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 16px;
+    flex: 1;
+  }
+
+  .tool-card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .tool-card-features li {
+    font-size: 0.8rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tool-card-features li::before {
+    content: '✓';
+    color: var(--success);
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .tool-card-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-body);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    transition: all 0.25s ease;
+  }
+
+  .tool-card.cropper .tool-card-action { color: var(--accent-cropper); }
+  .tool-card.resizer .tool-card-action { color: var(--accent-resizer); }
+  .tool-card.pdf .tool-card-action { color: var(--accent-pdf); }
+  .tool-card.nexus .tool-card-action { color: var(--accent-nexus); }
+  .tool-card.d3 .tool-card-action { color: var(--accent-3d); }
+
+  .tool-card:hover .tool-card-action {
+    background: var(--bg-panel);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tool-card-action svg {
+    transition: transform 0.25s ease;
+  }
+
+  .tool-card:hover .tool-card-action svg {
+    transform: translateX(4px);
+  }
+
+  /* --- TOOL VIEW --- */
+  .tool-view {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+  }
+
+  .tool-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
     border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .back-btn:hover {
+    background: var(--bg-body);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateX(-2px);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--primary);
+  }
+
+  .breadcrumb-sep {
+    color: var(--text-light);
+  }
+
+  .breadcrumb-current {
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .tool-header {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tool-header-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  #toolHeaderIcon.cropper { background: linear-gradient(135deg, var(--accent-cropper) 0%, #6366f1 100%); }
+  #toolHeaderIcon.resizer { background: linear-gradient(135deg, var(--accent-resizer) 0%, #0891b2 100%); }
+  #toolHeaderIcon.pdf { background: linear-gradient(135deg, var(--accent-pdf) 0%, #dc2626 100%); }
+  #toolHeaderIcon.nexus { background: linear-gradient(135deg, var(--accent-nexus) 0%, #7c3aed 100%); }
+  #toolHeaderIcon.d3 { background: linear-gradient(135deg, var(--accent-3d) 0%, #d97706 100%); }
+
+  .tool-header-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tool-header-info h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 4px;
+    letter-spacing: -0.02em;
+  }
+
+  .tool-header-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* --- Tool 1: Cropper Styles (preserved) --- */
+  .tool-container {
+    background: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    min-height: 600px;
     animation: slideUp 0.4s ease;
   }
 
@@ -176,12 +659,12 @@
   .toolbar {
     display: flex;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
   }
 
   .btn-group { 
@@ -192,25 +675,26 @@
 
   /* Buttons */
   .btn {
-    padding: 11px 20px;
+    padding: 10px 18px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     background: var(--bg-panel);
     color: var(--text-main);
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    font-family: inherit;
   }
 
   .btn:hover:not(:disabled) { 
     background: var(--bg-body); 
     border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
   }
   
   .btn-primary {
@@ -221,8 +705,8 @@
 
   .btn-primary:hover:not(:disabled) { 
     background: var(--primary-hover);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+    transform: translateY(-1px);
   }
 
   .btn:disabled { 
@@ -231,23 +715,32 @@
   }
 
   /* File Input */
-  .file-input-wrapper { position: relative; overflow: hidden; }
-  input[type="file"] {
-    font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
+  .file-input-wrapper { 
+    position: relative; 
+    overflow: hidden; 
+  }
+
+  .file-input-wrapper input[type="file"] {
+    font-size: 100px; 
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    opacity: 0; 
+    cursor: pointer;
   }
 
   /* Workspace */
   .canvas-area {
     flex: 1;
+    min-height: 400px;
     background: #e2e8f0;
-    /* Checkered pattern */
     background-image: linear-gradient(45deg, #cbd5e1 25%, transparent 25%), 
                       linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), 
                       linear-gradient(45deg, transparent 75%, #cbd5e1 75%), 
                       linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: auto;
     position: relative;
     display: flex;
@@ -283,38 +776,38 @@
   .status-bar {
     display: flex;
     justify-content: space-between;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
     font-weight: 500;
     color: var(--text-muted);
     padding: 10px 14px;
     background: var(--bg-body);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     margin-bottom: 16px;
     gap: 20px;
+    flex-wrap: wrap;
   }
 
   /* Result Area */
   .result-area {
     display: none; 
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-    margin-top: 24px;
+    border-top: 1px solid var(--border-light);
+    padding-top: 20px;
+    margin-top: 16px;
     text-align: center;
     animation: slideUp 0.4s ease;
   }
   .result-area.active { 
     display: block; 
-    animation: slideUp 0.4s ease;
   }
   
   .preview-img {
     max-width: 250px;
     max-height: 250px;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
     margin-bottom: 14px;
     object-fit: contain;
     background: var(--bg-body);
@@ -326,52 +819,590 @@
     transform: scale(1.05);
   }
 
-  /* --- External Tools (Resizer & Nexus) Shared Styles --- */
-  .external-tool-frame {
-    width: 100%;
-    height: 100%;
+  /* --- Enhanced Cropper: Drop Zone --- */
+  .drop-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(79, 70, 229, 0.08);
+    border: 3px dashed var(--primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  .drop-overlay.active {
+    opacity: 1;
+  }
+
+  .drop-overlay-content {
+    text-align: center;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.25rem;
+    pointer-events: none;
+  }
+
+  .drop-overlay-content svg {
+    display: block;
+    margin: 0 auto 12px;
+  }
+
+  /* --- Selection Box with Handles --- */
+  #selectionBox {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 4px rgba(79, 70, 229, 0.15);
+    display: none;
+    z-index: 10;
+    cursor: move;
+  }
+
+  #selectionBox.active { display: block; }
+
+  .sel-info {
+    position: absolute;
+    top: -32px;
+    left: 0;
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+  }
+
+  .sel-info::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 12px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid var(--primary);
+  }
+
+  .handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 11;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .handle:hover {
+    transform: scale(1.3);
+    background: var(--primary);
+  }
+
+  .handle.nw { top: -7px; left: -7px; cursor: nwse-resize; }
+  .handle.n  { top: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  .handle.ne { top: -7px; right: -7px; cursor: nesw-resize; }
+  .handle.e  { top: 50%; right: -7px; transform: translateY(-50%); cursor: ew-resize; }
+  .handle.se { bottom: -7px; right: -7px; cursor: nwse-resize; }
+  .handle.s  { bottom: -7px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  .handle.sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+  .handle.w  { top: 50%; left: -7px; transform: translateY(-50%); cursor: ew-resize; }
+
+  .handle.n:hover, .handle.s:hover { transform: translateX(-50%) scale(1.3); background: var(--primary); }
+  .handle.e:hover, .handle.w:hover { transform: translateY(-50%) scale(1.3); background: var(--primary); }
+
+  /* --- Cropper Toolbar Sections --- */
+  .cropper-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    background: linear-gradient(to bottom, #fafbfc, #ffffff);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+  }
+
+  .toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-section + .toolbar-section {
+    padding-left: 12px;
+    border-left: 1px solid var(--border-light);
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 4px;
+  }
+
+  .btn-icon {
+    padding: 8px 10px;
+    min-width: 36px;
+    justify-content: center;
+  }
+
+  .btn-icon:disabled {
+    opacity: 0.3;
+  }
+
+  /* Aspect ratio buttons */
+  .aspect-group {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-body);
+    padding: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  .aspect-btn {
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    min-width: 38px;
+  }
+
+  .aspect-btn:hover {
+    background: white;
+    color: var(--text-main);
+  }
+
+  .aspect-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+  }
+
+  /* Page navigator */
+  .page-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-body);
+    padding: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  .page-nav button {
+    padding: 5px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+  }
+
+  .page-nav button:hover:not(:disabled) {
+    background: white;
+    color: var(--primary);
+  }
+
+  .page-nav button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .page-indicator {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    padding: 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  /* --- Page Strip (for multi-page PDFs) --- */
+  .page-strip {
+    background: var(--bg-body);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  .page-strip.active { display: block; }
+
+  .page-strip-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-thumbnails {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+  }
+
+  .page-thumb {
+    flex-shrink: 0;
+    width: 70px;
+    height: 90px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .page-thumb:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+  }
+
+  .page-thumb.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+
+  .page-thumb-number {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* --- Result / Export Panel --- */
+  .result-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 24px;
+    align-items: start;
+    text-align: left;
+  }
+
+  .result-preview h4,
+  .result-export h4 {
+    margin: 0 0 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-preview {
+    text-align: center;
+  }
+
+  .result-preview img {
+    max-width: 100%;
+    max-height: 280px;
+  }
+
+  .export-row {
+    margin-bottom: 14px;
+  }
+
+  .export-row > label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .format-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--bg-body);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  .format-btn {
+    padding: 8px 4px;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .format-btn:hover {
+    background: white;
+    color: var(--text-main);
+  }
+
+  .format-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+  }
+
+  .quality-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .quality-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .quality-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+  }
+
+  .quality-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+
+  .quality-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .pdf-mode-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pdf-mode-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg-body);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pdf-mode-option:hover {
+    background: white;
+    border-color: var(--border);
+  }
+
+  .pdf-mode-option input[type="radio"] {
+    margin-top: 2px;
+    accent-color: var(--primary);
+  }
+
+  .pdf-mode-option.selected {
+    background: var(--primary-bg);
+    border-color: var(--primary-light);
+  }
+
+  .pdf-mode-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pdf-mode-option-text strong {
+    font-size: 0.8rem;
+    color: var(--text-main);
+  }
+
+  .pdf-mode-option-text small {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .export-info {
+    display: flex;
+    gap: 16px;
+    padding: 10px 12px;
+    background: var(--primary-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .export-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .export-info-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .export-info-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .btn-large {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    justify-content: center;
+  }
+
+  @media (max-width: 700px) {
+    .result-layout { grid-template-columns: 1fr; }
+    .toolbar-section + .toolbar-section { 
+      padding-left: 0; 
+      border-left: none; 
+      padding-top: 8px;
+      border-top: 1px solid var(--border-light);
+      width: 100%;
+    }
+  }
+
+  /* --- External Tools (Resizer, PDF Fixer, Nexus, 3D Designer) --- */
+  .external-tool-frame {
+    width: 100%;
+    height: calc(100vh - 280px);
+    min-height: 600px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     background: var(--bg-panel);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg);
     animation: fadeIn 0.4s ease;
+  }
+
+  .external-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 600px;
+    gap: 16px;
+    color: var(--text-muted);
+  }
+
+  .external-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   /* --- Toast Notifications --- */
   #toast-container {
     position: fixed;
-    bottom: 24px;
+    bottom: 90px;
     right: 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     z-index: 100;
+    pointer-events: none;
   }
 
   .toast {
     background: var(--text-main);
     color: white;
     padding: 14px 20px;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
     font-weight: 500;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-xl);
     display: flex;
     align-items: center;
     gap: 12px;
     animation: slideIn 0.4s ease forwards;
     min-width: 280px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: auto;
   }
 
   .toast.error { 
     background: var(--danger); 
-    border-color: rgba(255, 100, 100, 0.2);
   }
   .toast.success { 
     background: var(--success);
-    border-color: rgba(100, 255, 100, 0.2);
   }
 
   @keyframes slideIn {
@@ -385,18 +1416,84 @@
     }
   }
 
-  @media (max-width: 600px) {
+  /* --- Footer with Disclaimer --- */
+  footer {
+    background: white;
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .disclaimer {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .disclaimer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--accent-pdf-bg);
+    color: var(--accent-pdf);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .disclaimer-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .disclaimer-text strong {
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .footer-meta {
+    margin-top: 12px;
+    font-size: 0.7rem;
+    color: var(--text-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .footer-meta span:not(:last-child)::after {
+    content: '·';
+    margin-left: 12px;
+    color: var(--text-light);
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 768px) {
     header { padding: 0 16px; }
-    .brand span { display: none; } 
-    .brand::after { content: 'AVX Hub'; color: var(--text-main); }
-    main { padding: 10px; }
+    .header-tag { display: none; }
+    .brand-text small { display: none; }
+    .home-container { padding: 32px 16px 60px; }
+    .tool-view { padding: 16px 16px 32px; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .stats { gap: 24px; }
+    .hero h1 { font-size: 2rem; }
+    .tool-header { padding: 16px; flex-direction: column; text-align: center; }
     .toolbar { flex-direction: column; align-items: stretch; }
-    .btn-group { justify-content: space-between; }
-    
-    /* Adjust nav text for very small screens */
-    .nav-btn span { display: none; }
-    .nav-btn { padding: 8px; }
-    .nav-btn svg { margin: 0; }
+    .btn-group { justify-content: center; }
+    footer { padding: 20px 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .external-tool-frame { min-height: 500px; height: 70vh; }
   }
 </style>
 </head>
@@ -404,97 +1501,580 @@
 
 <!-- Header -->
 <header>
-  <div class="brand">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-    <span>AVX Tool Hub</span>
+  <div class="brand" onclick="navigate('home')">
+    <div class="brand-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+    </div>
+    <div class="brand-text">
+      <span>AVX Tool Hub</span>
+      <small>Professional Toolkit</small>
+    </div>
   </div>
-  
-  <nav class="nav-tabs">
-    <button class="nav-btn active" onclick="switchTab('cropper')" title="Cropper Tool">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
-      <span>Cropper</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('resizer')" title="Image Resizer">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-      <span>Resizer</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('pdf-fixer')" title="PDF Content Fixer">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2Z"/><path d="M14 2v6h6"/><path d="M12 11h4M12 15h6M12 19h4"/></svg>
-      <span>PDF Fixer</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('nexus')" title="AVX Nexus">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-      <span>Preflight</span>
-    </button>
-  </nav>
+  <div class="header-actions">
+    <div class="header-tag">All Systems Online</div>
+  </div>
 </header>
 
 <!-- Main Content -->
 <main>
 
-  <!-- TAB 1: CROPPER -->
-  <div id="cropper" class="tab-panel active">
-    <div class="tool-container">
-      <div class="toolbar">
-        <div class="file-input-wrapper btn btn-primary">
-          <span>📁 DROP File Here</span>
-          <input type="file" id="fileInput" accept="image/*, .pdf" />
+  <!-- HOME VIEW -->
+  <div id="home-view" class="view active">
+    <div class="home-container">
+      
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          5 Powerful Tools, Zero Cost
         </div>
+        <h1>Everything you need to <br/><span class="gradient">perfect your visuals</span></h1>
+        <p>A professional toolkit for image editing, PDF manipulation, and 3D design — all running securely in your browser. No uploads, no accounts, no limits.</p>
         
-        <div class="btn-group">
-          <button id="cropBtn" class="btn btn-primary" disabled>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
-            Crop
-          </button>
-          <button id="resetBtn" class="btn" disabled>↺ Reset</button>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value">5</div>
+            <div class="stat-label">Tools Available</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Client-Side</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Files Uploaded</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">∞</div>
+            <div class="stat-label">Usage Limit</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tool Selection -->
+      <section>
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Choose your tool</h2>
+            <p class="section-subtitle">Click any card to launch the tool</p>
+          </div>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- Cropper -->
+          <div class="tool-card cropper" onclick="navigate('cropper')">
+            <div class="tool-card-preview">
+              <div class="preview-illustration">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <rect x="10" y="20" width="80" height="60" rx="6" fill="white" stroke="#4f46e5" stroke-width="2"/>
+                  <circle cx="35" cy="40" r="5" fill="#4f46e5" opacity="0.3"/>
+                  <path d="M10 65 L40 35 L60 55 L90 25" stroke="#4f46e5" stroke-width="2" fill="none" opacity="0.4"/>
+                  <rect x="30" y="35" width="40" height="30" stroke="#4f46e5" stroke-width="2" stroke-dasharray="4 2" fill="rgba(79, 70, 229, 0.1)"/>
+                  <path d="M30 35 L30 30 M30 35 L35 35 M70 65 L70 70 M70 65 L65 65" stroke="#4f46e5" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="tool-card-body">
+              <div class="tool-card-header">
+                <div class="tool-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+                </div>
+                <span class="tool-card-tag">Editor</span>
+              </div>
+              <h3 class="tool-card-title">Image Cropper</h3>
+              <p class="tool-card-desc">Precisely crop images and PDF pages with pixel-perfect selection. Drag to define your crop area instantly.</p>
+              <ul class="tool-card-features">
+                <li>Image & PDF support</li>
+                <li>Pixel-precise selection</li>
+                <li>Instant PNG download</li>
+              </ul>
+              <div class="tool-card-action">
+                <span>Open Cropper</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resizer -->
+          <div class="tool-card resizer" onclick="navigate('resizer')">
+            <div class="tool-card-preview">
+              <div class="preview-illustration">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <rect x="10" y="25" width="45" height="50" rx="4" fill="white" stroke="#06b6d4" stroke-width="2"/>
+                  <rect x="50" y="40" width="40" height="45" rx="4" fill="white" stroke="#06b6d4" stroke-width="2" stroke-dasharray="3 2"/>
+                  <path d="M55 40 L55 25 L70 25 M50 65 L50 85 L35 85" stroke="#06b6d4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M70 25 L75 30 M50 85 L45 80" stroke="#06b6d4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="tool-card-body">
+              <div class="tool-card-header">
+                <div class="tool-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </div>
+                <span class="tool-card-tag">Transform</span>
+              </div>
+              <h3 class="tool-card-title">Image Resizer</h3>
+              <p class="tool-card-desc">Resize images to exact dimensions or scale by percentage. Maintain quality while adjusting file size.</p>
+              <ul class="tool-card-features">
+                <li>Custom width & height</li>
+                <li>Aspect ratio lock</li>
+                <li>Bulk resize support</li>
+              </ul>
+              <div class="tool-card-action">
+                <span>Open Resizer</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- PDF Fixer -->
+          <div class="tool-card pdf" onclick="navigate('pdf-fixer')">
+            <div class="tool-card-preview">
+              <div class="preview-illustration">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <path d="M25 15 L60 15 L80 35 L80 85 L25 85 Z" fill="white" stroke="#ef4444" stroke-width="2"/>
+                  <path d="M60 15 L60 35 L80 35" fill="none" stroke="#ef4444" stroke-width="2"/>
+                  <rect x="35" y="48" width="35" height="3" rx="1.5" fill="#ef4444" opacity="0.3"/>
+                  <rect x="35" y="56" width="35" height="3" rx="1.5" fill="#ef4444" opacity="0.3"/>
+                  <rect x="35" y="64" width="25" height="3" rx="1.5" fill="#ef4444" opacity="0.3"/>
+                  <path d="M70 70 L70 78 M66 74 L74 74" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                  <circle cx="70" cy="74" r="9" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="tool-card-body">
+              <div class="tool-card-header">
+                <div class="tool-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2Z"/><path d="M14 2v6h6"/><path d="M12 11h4M12 15h6M12 19h4"/></svg>
+                </div>
+                <span class="tool-card-tag">Repair</span>
+              </div>
+              <h3 class="tool-card-title">PDF Content Fixer</h3>
+              <p class="tool-card-desc">Repair damaged or corrupted PDF content. Extract, clean, and rebuild PDF files with broken structure.</p>
+              <ul class="tool-card-features">
+                <li>Fix broken PDFs</li>
+                <li>Extract text content</li>
+                <li>Rebuild structure</li>
+              </ul>
+              <div class="tool-card-action">
+                <span>Open PDF Fixer</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nexus (Preflight) -->
+          <div class="tool-card nexus" onclick="navigate('nexus')">
+            <div class="tool-card-preview">
+              <div class="preview-illustration">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <rect x="20" y="20" width="25" height="25" rx="3" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+                  <rect x="55" y="20" width="25" height="25" rx="3" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+                  <rect x="55" y="55" width="25" height="25" rx="3" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+                  <rect x="20" y="55" width="25" height="25" rx="3" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+                  <line x1="45" y1="32" x2="55" y2="32" stroke="#8b5cf6" stroke-width="2" opacity="0.5"/>
+                  <line x1="45" y1="67" x2="55" y2="67" stroke="#8b5cf6" stroke-width="2" opacity="0.5"/>
+                  <line x1="32" y1="45" x2="32" y2="55" stroke="#8b5cf6" stroke-width="2" opacity="0.5"/>
+                  <line x1="67" y1="45" x2="67" y2="55" stroke="#8b5cf6" stroke-width="2" opacity="0.5"/>
+                  <circle cx="32.5" cy="32.5" r="3" fill="#8b5cf6"/>
+                  <circle cx="67.5" cy="67.5" r="3" fill="#8b5cf6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="tool-card-body">
+              <div class="tool-card-header">
+                <div class="tool-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <span class="tool-card-tag">Workflow</span>
+              </div>
+              <h3 class="tool-card-title">AVX Nexus (Preflight)</h3>
+              <p class="tool-card-desc">Complete preflight workflow for print and production. Validate, analyze, and prepare files for output.</p>
+              <ul class="tool-card-features">
+                <li>File validation</li>
+                <li>Production analysis</li>
+                <li>Multi-step workflow</li>
+              </ul>
+              <div class="tool-card-action">
+                <span>Open Preflight</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3D Folding Multi-Panel Wrap Designer -->
+          <div class="tool-card d3" onclick="navigate('designer3d')">
+            <div class="tool-card-preview">
+              <div class="preview-illustration">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <path d="M50 20 L75 30 L75 55 L50 65 L25 55 L25 30 Z" fill="white" stroke="#f59e0b" stroke-width="2"/>
+                  <path d="M50 20 L50 65" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
+                  <path d="M50 20 L50 65 M25 30 L50 40 M75 30 L50 40 M50 40 L50 65" stroke="#f59e0b" stroke-width="1.5" opacity="0.6"/>
+                  <path d="M50 65 L50 80 L35 75 L35 60" fill="white" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
+                  <path d="M50 65 L50 80 L65 75 L65 60" fill="white" stroke="#f59e0b" stroke-width="2" opacity="0.5"/>
+                  <circle cx="50" cy="20" r="2.5" fill="#f59e0b"/>
+                  <circle cx="75" cy="30" r="2.5" fill="#f59e0b"/>
+                  <circle cx="25" cy="30" r="2.5" fill="#f59e0b"/>
+                  <circle cx="50" cy="40" r="2.5" fill="#f59e0b"/>
+                </svg>
+              </div>
+            </div>
+            <div class="tool-card-body">
+              <div class="tool-card-header">
+                <div class="tool-card-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <span class="tool-card-tag">3D Design</span>
+              </div>
+              <h3 class="tool-card-title">3D Folding Wrap Designer</h3>
+              <p class="tool-card-desc">Design multi-panel wrap layouts with 3D folding preview. Create packaging, boxes, and complex folded designs.</p>
+              <ul class="tool-card-features">
+                <li>Multi-panel layouts</li>
+                <li>3D folding preview</li>
+                <li>Export print-ready files</li>
+              </ul>
+              <div class="tool-card-action">
+                <span>Open 3D Designer</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- CROPPER VIEW -->
+  <div id="cropper-view" class="view">
+    <div class="tool-view">
+      <div class="tool-nav">
+        <button class="back-btn" onclick="navigate('home')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Tools
+        </button>
+        <div class="breadcrumb">
+          <a onclick="navigate('home')">Home</a>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">Image Cropper</span>
         </div>
       </div>
 
-      <!-- Coordinate Status -->
-      <div class="status-bar">
-        <span id="mouseCoords">Mouse: X: 0, Y: 0</span>
-        <span id="selectionSize">Selection: 0 x 0 px</span>
+      <div class="tool-header">
+        <div id="toolHeaderIcon" class="tool-header-icon cropper">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+        </div>
+        <div class="tool-header-info">
+          <h2>Image Cropper</h2>
+          <p>Drop an image or PDF, drag to select a region, and download a perfectly cropped PNG. All processing happens in your browser.</p>
+        </div>
       </div>
 
-      <!-- Canvas Workspace -->
-      <div id="workspace" class="canvas-area">
-        <p id="placeholderText" style="color:#64748b; font-weight:500; pointer-events:none; position:absolute;">Upload an image or PDF to start</p>
-        <canvas id="canvas"></canvas>
-        <div id="selectionRect"></div>
-      </div>
-
-      <!-- Result Section -->
-      <div id="resultArea" class="result-area">
-        <div style="display:flex; justify-content:center; align-items:center; gap:20px;">
-          <div>
-            <h4 style="margin:0 0 10px 0;">Cropped Result</h4>
-            <img id="resultImage" class="preview-img" alt="Cropped Image" />
+      <div class="tool-container">
+        <!-- Enhanced Toolbar -->
+        <div class="cropper-toolbar">
+          <div class="toolbar-section">
+            <div class="file-input-wrapper btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Upload</span>
+              <input type="file" id="fileInput" accept="image/*, .pdf" />
+            </div>
+            <button id="resetBtn" class="btn btn-icon" title="Reset" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
           </div>
-          <div style="text-align:left;">
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Your selection has been processed.</p>
-            <a id="downloadLink" class="btn btn-primary" href="#" download="cropped-result.png">⬇ Download</a>
+
+          <div class="toolbar-section" id="transformSection" style="display:none">
+            <span class="section-label">Transform</span>
+            <button class="btn btn-icon" id="rotateLeftBtn" title="Rotate 90° left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
+            <button class="btn btn-icon" id="rotateRightBtn" title="Rotate 90° right">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-section" id="aspectSection" style="display:none">
+            <span class="section-label">Aspect</span>
+            <div class="aspect-group">
+              <button class="aspect-btn active" data-aspect="free">Free</button>
+              <button class="aspect-btn" data-aspect="1:1">1:1</button>
+              <button class="aspect-btn" data-aspect="4:3">4:3</button>
+              <button class="aspect-btn" data-aspect="16:9">16:9</button>
+              <button class="aspect-btn" data-aspect="3:2">3:2</button>
+              <button class="aspect-btn" data-aspect="A4">A4</button>
+            </div>
+          </div>
+
+          <div class="toolbar-section" id="pageSection" style="display:none">
+            <span class="section-label">Page</span>
+            <div class="page-nav">
+              <button id="prevPageBtn" title="Previous page">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <span class="page-indicator" id="pageIndicator">1 / 1</span>
+              <button id="nextPageBtn" title="Next page">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span id="mouseCoords">Mouse: X: 0, Y: 0</span>
+          <span id="selectionSize">Selection: None</span>
+          <span id="imageInfo">No file loaded</span>
+        </div>
+
+        <!-- Canvas Workspace -->
+        <div id="workspace" class="canvas-area">
+          <p id="placeholderText" style="color:#64748b; font-weight:600; pointer-events:none; position:absolute; text-align:center; max-width:80%;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:0 auto 12px; opacity:0.4;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span style="font-size:1rem; display:block; margin-bottom:6px;">Drop an image or PDF here</span>
+            <span style="font-size:0.85rem; opacity:0.7;">or click the Upload button above</span>
+          </p>
+          <canvas id="canvas"></canvas>
+          <div id="selectionBox">
+            <div class="sel-info" id="selInfo">0 × 0</div>
+            <div class="handle nw" data-handle="nw"></div>
+            <div class="handle n" data-handle="n"></div>
+            <div class="handle ne" data-handle="ne"></div>
+            <div class="handle e" data-handle="e"></div>
+            <div class="handle se" data-handle="se"></div>
+            <div class="handle s" data-handle="s"></div>
+            <div class="handle sw" data-handle="sw"></div>
+            <div class="handle w" data-handle="w"></div>
+          </div>
+          <div class="drop-overlay" id="dropOverlay">
+            <div class="drop-overlay-content">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Drop your file to start cropping
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Strip (PDFs only) -->
+        <div class="page-strip" id="pageStrip">
+          <div class="page-strip-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>Pages · click to navigate</span>
+          </div>
+          <div class="page-thumbnails" id="pageThumbnails"></div>
+        </div>
+
+        <!-- Result / Export Panel -->
+        <div id="resultArea" class="result-area">
+          <div class="result-layout">
+            <div class="result-preview">
+              <h4>Preview</h4>
+              <img id="resultImage" class="preview-img" alt="Cropped result" />
+            </div>
+            <div class="result-export">
+              <h4>Export</h4>
+
+              <div class="export-row">
+                <label>Format</label>
+                <div class="format-selector" id="formatSelector">
+                  <button class="format-btn active" data-format="png">PNG</button>
+                  <button class="format-btn" data-format="jpg">JPG</button>
+                  <button class="format-btn" data-format="webp">WebP</button>
+                  <button class="format-btn" data-format="pdf">PDF</button>
+                </div>
+              </div>
+
+              <div class="export-row" id="qualityRow" style="display:none">
+                <label>Quality</label>
+                <div class="quality-control">
+                  <input type="range" class="quality-slider" id="qualitySlider" min="0.5" max="1" step="0.05" value="0.92" />
+                  <span class="quality-value" id="qualityValue">92%</span>
+                </div>
+              </div>
+
+              <div class="export-row" id="pdfModeRow" style="display:none">
+                <label>PDF Type</label>
+                <div class="pdf-mode-selector" id="pdfModeSelector">
+                  <label class="pdf-mode-option selected">
+                    <input type="radio" name="pdfMode" value="image" checked />
+                    <div class="pdf-mode-option-text">
+                      <strong>Image PDF</strong>
+                      <small>Embedded as image — works everywhere</small>
+                    </div>
+                  </label>
+                  <label class="pdf-mode-option" id="vectorPdfOption">
+                    <input type="radio" name="pdfMode" value="vector" />
+                    <div class="pdf-mode-option-text">
+                      <strong>Vector PDF <span style="color:var(--success); font-size:0.7rem;">[PDF only]</span></strong>
+                      <small>Preserves text, fonts & vectors (best quality)</small>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="export-info">
+                <div class="export-info-item">
+                  <span class="export-info-label">Output Size</span>
+                  <span class="export-info-value" id="outputDimensions">0 × 0</span>
+                </div>
+                <div class="export-info-item">
+                  <span class="export-info-label">Est. File</span>
+                  <span class="export-info-value" id="outputFileSize">—</span>
+                </div>
+                <div class="export-info-item">
+                  <span class="export-info-label">Source</span>
+                  <span class="export-info-value" id="outputSource">—</span>
+                </div>
+              </div>
+
+              <a id="downloadLink" class="btn btn-primary btn-large" href="#" download>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TAB 2: RESIZER -->
-  <div id="resizer" class="tab-panel">
-    <iframe id="resizer-frame" class="external-tool-frame" src="https://ariesaves.github.io/Image-Resizer/" title="Image Resizer Tool"></iframe>
+  <!-- RESIZER VIEW -->
+  <div id="resizer-view" class="view">
+    <div class="tool-view">
+      <div class="tool-nav">
+        <button class="back-btn" onclick="navigate('home')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Tools
+        </button>
+        <div class="breadcrumb">
+          <a onclick="navigate('home')">Home</a>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">Image Resizer</span>
+        </div>
+      </div>
+
+      <div class="tool-header">
+        <div id="toolHeaderIcon" class="tool-header-icon resizer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        </div>
+        <div class="tool-header-info">
+          <h2>Image Resizer</h2>
+          <p>Resize images to exact dimensions or scale proportionally. Adjust width, height, and quality with live preview.</p>
+        </div>
+      </div>
+
+      <iframe id="resizer-frame" class="external-tool-frame" src="about:blank" title="Image Resizer Tool"></iframe>
+    </div>
   </div>
 
-  <!-- TAB 3: PDF CONTENT FIXER -->
-  <div id="pdf-fixer" class="tab-panel">
-    <iframe id="pdf-fixer-frame" class="external-tool-frame" src="https://ariesaves.github.io/pdf-content-fixer-v1/" title="PDF Content Fixer Tool"></iframe>
+  <!-- PDF FIXER VIEW -->
+  <div id="pdf-fixer-view" class="view">
+    <div class="tool-view">
+      <div class="tool-nav">
+        <button class="back-btn" onclick="navigate('home')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Tools
+        </button>
+        <div class="breadcrumb">
+          <a onclick="navigate('home')">Home</a>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">PDF Content Fixer</span>
+        </div>
+      </div>
+
+      <div class="tool-header">
+        <div id="toolHeaderIcon" class="tool-header-icon pdf">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2Z"/><path d="M14 2v6h6"/><path d="M12 11h4M12 15h6M12 19h4"/></svg>
+        </div>
+        <div class="tool-header-info">
+          <h2>PDF Content Fixer</h2>
+          <p>Repair and rebuild PDF files with broken structure. Extract text content, fix encoding issues, and re-save working documents.</p>
+        </div>
+      </div>
+
+      <iframe id="pdf-fixer-frame" class="external-tool-frame" src="about:blank" title="PDF Content Fixer Tool"></iframe>
+    </div>
   </div>
 
-  <!-- TAB 4: NEXUS (NEW) -->
-  <div id="nexus" class="tab-panel">
-    <iframe id="nexus-frame" class="external-tool-frame" src="https://ariesaves.github.io/AVXNexus/" title="AVX Nexus Tool"></iframe>
+  <!-- NEXUS (PREFLIGHT) VIEW -->
+  <div id="nexus-view" class="view">
+    <div class="tool-view">
+      <div class="tool-nav">
+        <button class="back-btn" onclick="navigate('home')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Tools
+        </button>
+        <div class="breadcrumb">
+          <a onclick="navigate('home')">Home</a>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">AVX Nexus (Preflight)</span>
+        </div>
+      </div>
+
+      <div class="tool-header">
+        <div id="toolHeaderIcon" class="tool-header-icon nexus">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </div>
+        <div class="tool-header-info">
+          <h2>AVX Nexus (Preflight)</h2>
+          <p>Complete preflight workflow for print and production. Validate files, analyze output, and ensure everything is print-ready.</p>
+        </div>
+      </div>
+
+      <iframe id="nexus-frame" class="external-tool-frame" src="about:blank" title="AVX Nexus Tool"></iframe>
+    </div>
+  </div>
+
+  <!-- 3D DESIGNER VIEW -->
+  <div id="designer3d-view" class="view">
+    <div class="tool-view">
+      <div class="tool-nav">
+        <button class="back-btn" onclick="navigate('home')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Tools
+        </button>
+        <div class="breadcrumb">
+          <a onclick="navigate('home')">Home</a>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">3D Folding Wrap Designer</span>
+        </div>
+      </div>
+
+      <div class="tool-header">
+        <div id="toolHeaderIcon" class="tool-header-icon d3">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <div class="tool-header-info">
+          <h2>3D Folding Multi-Panel Wrap Designer</h2>
+          <p>Design complex multi-panel wraps with 3D folding preview. Perfect for packaging, boxes, and creative folded structures.</p>
+        </div>
+      </div>
+
+      <iframe id="designer3d-frame" class="external-tool-frame" src="about:blank" title="3D Folding Multi-Panel Wrap Designer"></iframe>
+    </div>
   </div>
 
 </main>
+
+<!-- Footer with Disclaimer -->
+<footer>
+  <div class="disclaimer">
+    <div class="disclaimer-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Important Disclaimer
+    </div>
+    <p class="disclaimer-text">
+      <strong>Files are processed entirely in your browser</strong> — no data is uploaded to any server. <strong>Always keep backup copies</strong> of your original files before using any tool. While we strive for accuracy, <strong>we make no warranties</strong> about the reliability or fitness of these tools for any particular purpose. Use at your own risk.
+    </p>
+    <div class="footer-meta">
+      <span>© 2026 AVX Tool Hub</span>
+      <span>Client-side processing</span>
+      <span>No data collection</span>
+      <span>v2.0</span>
+    </div>
+  </div>
+</footer>
 
 <!-- Toast Container -->
 <div id="toast-container"></div>
@@ -503,50 +2083,137 @@
 // --- PDF.js Setup ---
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// --- Navigation ---
+const TOOL_URLS = {
+  resizer: 'https://ariesaves.github.io/Image-Resizer/',
+  'pdf-fixer': 'https://ariesaves.github.io/pdf-content-fixer-v1/',
+  nexus: 'https://ariesaves.github.io/AVXNexus/',
+  designer3d: 'https://ariesaves.github.io/AVX-3D-Folding-Multi-Panel-Wrap-Designer/'
+};
+
+const loadedFrames = new Set();
+
+function navigate(target) {
+  // Update views
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  
+  if (target === 'home') {
+    document.getElementById('home-view').classList.add('active');
+  } else {
+    const view = document.getElementById(target + '-view');
+    if (view) {
+      view.classList.add('active');
+      
+      // Lazy load iframe on first visit
+      if (!loadedFrames.has(target)) {
+        const frame = document.getElementById(target + '-frame');
+        if (frame && TOOL_URLS[target]) {
+          frame.src = TOOL_URLS[target];
+          loadedFrames.add(target);
+        }
+      }
+    }
+  }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Update document title
+  if (target === 'home') {
+    document.title = 'AVX Tool Hub | Professional Image & PDF Toolkit';
+  }
+}
+
+// =============================================================
+// ENHANCED CROPPER
+// =============================================================
+
 // --- State & DOM Elements ---
 const fileInput = document.getElementById('fileInput');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const selectionRect = document.getElementById('selectionRect');
+const selectionBox = document.getElementById('selectionBox');
+const selInfo = document.getElementById('selInfo');
 const resultImage = document.getElementById('resultImage');
 const downloadLink = document.getElementById('downloadLink');
 const workspace = document.getElementById('workspace');
 const placeholderText = document.getElementById('placeholderText');
 const mouseCoordsDisplay = document.getElementById('mouseCoords');
 const selectionSizeDisplay = document.getElementById('selectionSize');
-const cropBtn = document.getElementById('cropBtn');
+const imageInfo = document.getElementById('imageInfo');
 const resetBtn = document.getElementById('resetBtn');
 const resultArea = document.getElementById('resultArea');
+const dropOverlay = document.getElementById('dropOverlay');
+const transformSection = document.getElementById('transformSection');
+const aspectSection = document.getElementById('aspectSection');
+const pageSection = document.getElementById('pageSection');
+const pageStrip = document.getElementById('pageStrip');
+const pageThumbnails = document.getElementById('pageThumbnails');
+const pageIndicator = document.getElementById('pageIndicator');
+const prevPageBtn = document.getElementById('prevPageBtn');
+const nextPageBtn = document.getElementById('nextPageBtn');
+const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+const rotateRightBtn = document.getElementById('rotateRightBtn');
+const formatSelector = document.getElementById('formatSelector');
+const qualityRow = document.getElementById('qualityRow');
+const qualitySlider = document.getElementById('qualitySlider');
+const qualityValue = document.getElementById('qualityValue');
+const pdfModeRow = document.getElementById('pdfModeRow');
+const pdfModeSelector = document.getElementById('pdfModeSelector');
+const vectorPdfOption = document.getElementById('vectorPdfOption');
+const outputDimensions = document.getElementById('outputDimensions');
+const outputFileSize = document.getElementById('outputFileSize');
+const outputSource = document.getElementById('outputSource');
 
-let originalImage = new Image();
-let imageLoaded = false;
+// --- State ---
+const state = {
+  // Source
+  sourceType: null,            // 'image' | 'pdf'
+  sourceFileName: '',
+  sourceImage: null,           // HTMLImageElement
+  sourceCanvas: null,          // Cached source canvas (after rotation applied)
+  sourceNaturalW: 0,
+  sourceNaturalH: 0,
+  
+  // PDF state
+  pdfDoc: null,                // pdf.js document
+  pdfBytes: null,              // Uint8Array (for vector PDF export)
+  pdfPageCount: 0,
+  currentPage: 1,
+  pdfPageThumbnails: [],       // dataURLs of each page
+  
+  // Transform
+  rotation: 0,                 // 0, 90, 180, 270
+  
+  // Display
+  imageLoaded: false,
+  
+  // Selection (in source-canvas coordinates, which already has rotation baked in)
+  selection: { x: 0, y: 0, w: 0, h: 0 },
+  
+  // Aspect ratio
+  aspectMode: 'free',
+  aspectRatio: null,           // numeric ratio (w/h), null when free
+  
+  // Interaction
+  interaction: null,           // null | { type: 'create'|'move'|'resize', handle?: string, startX, startY, startSel }
+  
+  // Output
+  outputFormat: 'png',
+  outputQuality: 0.92,
+  pdfMode: 'image',            // 'image' | 'vector'
+  lastCroppedDataURL: null,
+  lastCroppedBlob: null
+};
 
-// Selection State
-let isDragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
-let selection = { x: 0, y: 0, w: 0, h: 0 };
-
-// --- Tab Switching Logic ---
-function switchTab(tabId) {
-  // Update Buttons
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-  // Find button that calls switchTab with the specific ID
-  const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-  if(activeBtn) activeBtn.classList.add('active');
-
-  // Update Panels
-  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-
-  // If switching back to cropper, ensure overlay is positioned correctly
-  if (tabId === 'cropper' && imageLoaded) {
-    // Slight delay to allow display:block to render so getBoundingClientRect works
-    setTimeout(() => {
-      updateSelectionOverlay();
-    }, 50);
-  }
-}
+const ASPECT_RATIOS = {
+  'free': null,
+  '1:1': 1,
+  '4:3': 4/3,
+  '3:2': 3/2,
+  '16:9': 16/9,
+  'A4': Math.sqrt(2)
+};
 
 // --- Toast Notification System ---
 function showToast(message, type = 'info') {
@@ -562,243 +2229,840 @@ function showToast(message, type = 'info') {
   
   container.appendChild(toast);
 
-  // Remove after 3 seconds
   setTimeout(() => {
     toast.style.animation = 'slideIn 0.3s ease reverse forwards';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
-// --- File Handling ---
+// =============================================================
+// FILE LOADING
+// =============================================================
 
 fileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
-  if (!file) return;
+  if (file) await loadFile(file);
+});
 
-  resetUI();
-  resultArea.classList.remove('active');
+// Drag-and-drop on the entire workspace
+['dragenter', 'dragover'].forEach(evt => {
+  workspace.addEventListener(evt, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes('Files')) {
+      dropOverlay.classList.add('active');
+    }
+  });
+  
+  document.body.addEventListener(evt, (e) => {
+    e.preventDefault();
+  });
+});
 
-  if (file.type.startsWith('image/')) {
-    loadImageFromFile(file);
-  } else if (file.type === 'application/pdf') {
-    loadPdfFromFile(file);
-  } else {
-    showToast("Please upload a valid image or PDF file.", "error");
+['dragleave', 'drop'].forEach(evt => {
+  workspace.addEventListener(evt, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (evt === 'dragleave' && e.target !== workspace) return;
+    dropOverlay.classList.remove('active');
+  });
+});
+
+workspace.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  dropOverlay.classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    // Set the file input so the change handler consistency is maintained
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    await loadFile(file);
   }
 });
 
+async function loadFile(file) {
+  resultArea.classList.remove('active');
+  resetSelection();
+  
+  state.sourceFileName = file.name.replace(/\.[^.]+$/, '');
+
+  if (file.type.startsWith('image/')) {
+    await loadImageFromFile(file);
+  } else if (file.type === 'application/pdf') {
+    await loadPdfFromFile(file);
+  } else {
+    showToast("Please upload a valid image or PDF file.", "error");
+    return;
+  }
+  
+  // Show tool sections
+  transformSection.style.display = 'flex';
+  aspectSection.style.display = 'flex';
+  resetBtn.disabled = false;
+}
+
 function loadImageFromFile(file) {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    originalImage = new Image();
-    originalImage.onload = () => {
-      initCanvas(originalImage);
-      showToast("Image loaded successfully", "success");
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        state.sourceType = 'image';
+        state.sourceImage = img;
+        state.sourceNaturalW = img.width;
+        state.sourceNaturalH = img.height;
+        state.rotation = 0;
+        state.pdfDoc = null;
+        state.pdfBytes = null;
+        state.pdfPageCount = 0;
+        pageStrip.classList.remove('active');
+        pageSection.style.display = 'none';
+        renderSource();
+        imageInfo.textContent = `Image · ${img.width} × ${img.height}px`;
+        showToast("Image loaded successfully", "success");
+        resolve();
+      };
+      img.onerror = () => {
+        showToast("Failed to load image", "error");
+        reject();
+      };
+      img.src = event.target.result;
     };
-    originalImage.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
 }
 
 async function loadPdfFromFile(file) {
   try {
     const arrayBuffer = await file.arrayBuffer();
+    // Make a copy for pdf-lib (which consumes the buffer)
+    state.pdfBytes = new Uint8Array(arrayBuffer.slice(0));
+    
     const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
     const pdf = await loadingTask.promise;
-    const page = await pdf.getPage(1);
+    state.pdfDoc = pdf;
+    state.pdfPageCount = pdf.numPages;
+    state.sourceType = 'pdf';
+    state.currentPage = 1;
     
-    // High quality render
-    const viewport = page.getViewport({ scale: 2.0 });
-
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCanvas.height = viewport.height;
-    tempCanvas.width = viewport.width;
-
-    await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
-
-    const pdfImg = new Image();
-    pdfImg.onload = () => {
-      initCanvas(pdfImg);
-      showToast("PDF loaded successfully", "success");
-    };
-    pdfImg.src = tempCanvas.toDataURL();
-
+    pageSection.style.display = 'flex';
+    pageStrip.classList.add('active');
+    vectorPdfOption.style.display = 'flex';
+    
+    showToast(`PDF loaded · ${pdf.numPages} page${pdf.numPages > 1 ? 's' : ''}`, 'success');
+    
+    // Render thumbnails
+    await renderPdfThumbnails(pdf);
+    
+    // Render current page
+    await renderCurrentPdfPage();
+    
   } catch (error) {
     console.error("PDF Error:", error);
     showToast("Error loading PDF. Is it password protected?", "error");
   }
 }
 
-// --- Canvas Logic ---
-
-function initCanvas(sourceImage) {
-  canvas.width = sourceImage.width;
-  canvas.height = sourceImage.height;
-  ctx.drawImage(sourceImage, 0, 0);
+async function renderPdfThumbnails(pdf) {
+  state.pdfPageThumbnails = [];
+  pageThumbnails.innerHTML = '';
   
-  imageLoaded = true;
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 0.25 });
+    const tmpCanvas = document.createElement('canvas');
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCanvas.width = viewport.width;
+    tmpCanvas.height = viewport.height;
+    await page.render({ canvasContext: tmpCtx, viewport }).promise;
+    
+    const dataUrl = tmpCanvas.toDataURL('image/jpeg', 0.6);
+    state.pdfPageThumbnails.push(dataUrl);
+    
+    const thumb = document.createElement('div');
+    thumb.className = 'page-thumb' + (i === state.currentPage ? ' active' : '');
+    thumb.dataset.page = i;
+    thumb.innerHTML = `<img src="${dataUrl}" alt="Page ${i}" /><span class="page-thumb-number">${i}</span>`;
+    thumb.addEventListener('click', () => goToPage(i));
+    pageThumbnails.appendChild(thumb);
+  }
+}
+
+function goToPage(pageNum) {
+  if (pageNum < 1 || pageNum > state.pdfPageCount) return;
+  state.currentPage = pageNum;
+  state.rotation = 0;
+  pageIndicator.textContent = `${pageNum} / ${state.pdfPageCount}`;
+  prevPageBtn.disabled = pageNum === 1;
+  nextPageBtn.disabled = pageNum === state.pdfPageCount;
+  
+  // Update thumbnail active state
+  document.querySelectorAll('.page-thumb').forEach((el, idx) => {
+    el.classList.toggle('active', idx + 1 === pageNum);
+  });
+  
+  renderCurrentPdfPage();
+}
+
+async function renderCurrentPdfPage() {
+  const page = await state.pdfDoc.getPage(state.currentPage);
+  const viewport = page.getViewport({ scale: 2.0 });
+  
+  const tmpCanvas = document.createElement('canvas');
+  const tmpCtx = tmpCanvas.getContext('2d');
+  tmpCanvas.width = viewport.width;
+  tmpCanvas.height = viewport.height;
+  await page.render({ canvasContext: tmpCtx, viewport }).promise;
+  
+  // Convert to image
+  const dataUrl = tmpCanvas.toDataURL('image/png');
+  const img = new Image();
+  img.onload = () => {
+    state.sourceImage = img;
+    state.sourceNaturalW = img.width;
+    state.sourceNaturalH = img.height;
+    state.rotation = 0;
+    renderSource();
+    imageInfo.textContent = `PDF · Page ${state.currentPage} of ${state.pdfPageCount} · ${img.width} × ${img.height}px`;
+  };
+  img.src = dataUrl;
+}
+
+prevPageBtn.addEventListener('click', () => goToPage(state.currentPage - 1));
+nextPageBtn.addEventListener('click', () => goToPage(state.currentPage + 1));
+
+// =============================================================
+// SOURCE RENDERING (with rotation)
+// =============================================================
+
+function renderSource() {
+  // Build the source canvas: original image + applied rotation
+  const rot = state.rotation;
+  const swap = rot === 90 || rot === 270;
+  const w = swap ? state.sourceNaturalH : state.sourceNaturalW;
+  const h = swap ? state.sourceNaturalW : state.sourceNaturalH;
+  
+  state.sourceCanvas = document.createElement('canvas');
+  state.sourceCanvas.width = w;
+  state.sourceCanvas.height = h;
+  const sctx = state.sourceCanvas.getContext('2d');
+  
+  sctx.save();
+  sctx.translate(w / 2, h / 2);
+  sctx.rotate(rot * Math.PI / 180);
+  sctx.drawImage(state.sourceImage, -state.sourceNaturalW / 2, -state.sourceNaturalH / 2);
+  sctx.restore();
+  
+  // Render to display canvas with fit-to-workspace scaling
+  canvas.width = w;
+  canvas.height = h;
+  ctx.drawImage(state.sourceCanvas, 0, 0);
+  
+  state.imageLoaded = true;
   canvas.style.display = 'block';
   placeholderText.style.display = 'none';
-  cropBtn.disabled = false;
-  resetBtn.disabled = false;
-  updateStatusDisplay(0, 0, 0, 0);
+  
+  // Clear selection when source changes
+  resetSelection();
+  
+  // Auto-create a default selection if none exists
+  if (state.selection.w === 0) {
+    const margin = 0.1;
+    state.selection = {
+      x: Math.round(w * margin),
+      y: Math.round(h * margin),
+      w: Math.round(w * (1 - margin * 2)),
+      h: Math.round(h * (1 - margin * 2))
+    };
+    updateSelectionUI();
+  }
 }
 
-function resetUI() {
-  selection = { x: 0, y: 0, w: 0, h: 0 };
-  selectionRect.style.display = 'none';
-  updateStatusDisplay(0, 0, 0, 0);
+// =============================================================
+// ROTATION
+// =============================================================
+
+rotateLeftBtn.addEventListener('click', () => {
+  if (!state.imageLoaded) return;
+  state.rotation = (state.rotation - 90 + 360) % 360;
+  renderSource();
+});
+
+rotateRightBtn.addEventListener('click', () => {
+  if (!state.imageLoaded) return;
+  state.rotation = (state.rotation + 90) % 360;
+  renderSource();
+});
+
+// =============================================================
+// ASPECT RATIO
+// =============================================================
+
+document.querySelectorAll('.aspect-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.aspectMode = btn.dataset.aspect;
+    state.aspectRatio = ASPECT_RATIOS[state.aspectMode];
+    
+    // Apply aspect ratio to current selection
+    if (state.selection.w > 0 && state.aspectRatio) {
+      applyAspectRatio(state.selection.x + state.selection.w / 2, state.selection.y + state.selection.h / 2);
+    }
+  });
+});
+
+function applyAspectRatio(centerX, centerY) {
+  if (!state.aspectRatio) return;
+  
+  // Fit the largest possible selection with this aspect ratio within the canvas
+  const canvasAR = canvas.width / canvas.height;
+  let w, h;
+  if (state.aspectRatio > canvasAR) {
+    w = canvas.width * 0.9;
+    h = w / state.aspectRatio;
+  } else {
+    h = canvas.height * 0.9;
+    w = h * state.aspectRatio;
+  }
+  
+  state.selection = {
+    x: Math.round(centerX - w / 2),
+    y: Math.round(centerY - h / 2),
+    w: Math.round(w),
+    h: Math.round(h)
+  };
+  
+  clampSelection();
+  updateSelectionUI();
 }
 
-// --- Interaction ---
+// =============================================================
+// SELECTION LOGIC
+// =============================================================
+
+function resetSelection() {
+  state.selection = { x: 0, y: 0, w: 0, h: 0 };
+  selectionBox.classList.remove('active');
+  updateStatusDisplay();
+}
+
+function clampSelection() {
+  // Clamp to canvas bounds
+  state.selection.x = Math.max(0, Math.min(canvas.width - 1, state.selection.x));
+  state.selection.y = Math.max(0, Math.min(canvas.height - 1, state.selection.y));
+  state.selection.w = Math.max(1, Math.min(canvas.width - state.selection.x, state.selection.w));
+  state.selection.h = Math.max(1, Math.min(canvas.height - state.selection.y, state.selection.h));
+}
 
 function getCanvasCoordinates(event) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const x = (event.clientX - rect.left) * scaleX;
-  const y = (event.clientY - rect.top) * scaleY;
-
   return {
-    x: Math.max(0, Math.min(canvas.width, x)),
-    y: Math.max(0, Math.min(canvas.height, y))
+    x: Math.max(0, Math.min(canvas.width, (event.clientX - rect.left) * scaleX)),
+    y: Math.max(0, Math.min(canvas.height, (event.clientY - rect.top) * scaleY))
   };
 }
 
-canvas.addEventListener('mousemove', (e) => {
-  const pos = getCanvasCoordinates(e);
-  mouseCoordsDisplay.textContent = `Mouse: X: ${Math.round(pos.x)}, Y: ${Math.round(pos.y)}`;
-
-  if (!isDragging) return;
-
-  let currentX = pos.x;
-  let currentY = pos.y;
-  let w = currentX - dragStartX;
-  let h = currentY - dragStartY;
-
-  // Normalize
-  let x = dragStartX;
-  let y = dragStartY;
-
-  if (w < 0) { x = currentX; w = Math.abs(w); }
-  if (h < 0) { y = currentY; h = Math.abs(h); }
-
-  selection = { x, y, w, h };
-  updateSelectionOverlay();
-  updateStatusDisplay(x, y, w, h);
-});
-
-canvas.addEventListener('mousedown', (e) => {
-  if (!imageLoaded) return;
-  isDragging = true;
-  const pos = getCanvasCoordinates(e);
-  dragStartX = pos.x;
-  dragStartY = pos.y;
-  selection = { x: pos.x, y: pos.y, w: 0, h: 0 };
-  updateSelectionOverlay();
-});
-
-window.addEventListener('mouseup', () => {
-  if (isDragging) {
-    isDragging = false;
-    if (selection.w < 2 || selection.h < 2) {
-      resetUI();
-    }
-  }
-});
-
-function updateSelectionOverlay() {
-  if (selection.w === 0 || selection.h === 0) {
-    selectionRect.style.display = 'none';
+function updateSelectionUI() {
+  if (!state.imageLoaded || state.selection.w === 0 || state.selection.h === 0) {
+    selectionBox.classList.remove('active');
     return;
   }
-
+  
   const canvasRect = canvas.getBoundingClientRect();
   const workspaceRect = workspace.getBoundingClientRect();
   const offsetX = canvasRect.left - workspaceRect.left;
   const offsetY = canvasRect.top - workspaceRect.top;
-
+  
   const scaleX = canvasRect.width / canvas.width;
   const scaleY = canvasRect.height / canvas.height;
-
-  const cssX = selection.x * scaleX;
-  const cssY = selection.y * scaleY;
-  const cssW = selection.w * scaleX;
-  const cssH = selection.h * scaleY;
-
-  selectionRect.style.display = 'block';
-  selectionRect.style.left = (offsetX + cssX) + 'px';
-  selectionRect.style.top = (offsetY + cssY) + 'px';
-  selectionRect.style.width = cssW + 'px';
-  selectionRect.style.height = cssH + 'px';
+  
+  const cssX = state.selection.x * scaleX;
+  const cssY = state.selection.y * scaleY;
+  const cssW = state.selection.w * scaleX;
+  const cssH = state.selection.h * scaleY;
+  
+  selectionBox.style.left = (offsetX + cssX) + 'px';
+  selectionBox.style.top = (offsetY + cssY) + 'px';
+  selectionBox.style.width = cssW + 'px';
+  selectionBox.style.height = cssH + 'px';
+  selectionBox.classList.add('active');
+  
+  selInfo.textContent = `${Math.round(state.selection.w)} × ${Math.round(state.selection.h)}`;
+  
+  updateStatusDisplay();
+  updateOutputInfo();
+  
+  // Auto-trigger export for live preview
+  if (state.selection.w > 5 && state.selection.h > 5) {
+    clearTimeout(window._autoCropTimer);
+    window._autoCropTimer = setTimeout(() => {
+      if (typeof cropAndExport === 'function') cropAndExport();
+    }, 100);
+  }
 }
 
-function updateStatusDisplay(x, y, w, h) {
-  if(w === 0 && h === 0) {
+function updateStatusDisplay() {
+  if (state.selection.w === 0) {
     selectionSizeDisplay.textContent = "Selection: None";
   } else {
-    selectionSizeDisplay.textContent = `Selection: ${Math.round(w)} x ${Math.round(h)} px`;
+    selectionSizeDisplay.textContent = `Selection: ${Math.round(state.selection.w)} × ${Math.round(state.selection.h)} px`;
   }
 }
 
-// --- Crop Logic ---
-
-cropBtn.addEventListener('click', () => {
-  if (!imageLoaded || selection.w === 0 || selection.h === 0) {
-    showToast("Please draw a selection box first.", "error");
+function updateOutputInfo() {
+  if (state.selection.w === 0) {
+    outputDimensions.textContent = '0 × 0';
+    outputFileSize.textContent = '—';
     return;
   }
+  outputDimensions.textContent = `${Math.round(state.selection.w)} × ${Math.round(state.selection.h)}`;
+  // Rough estimate
+  const pixels = state.selection.w * state.selection.h;
+  const estKB = Math.round(pixels * (state.outputFormat === 'jpg' ? 0.4 : state.outputFormat === 'webp' ? 0.3 : 4) / 1024);
+  outputFileSize.textContent = estKB < 1024 ? `~${estKB} KB` : `~${(estKB/1024).toFixed(1)} MB`;
+  outputSource.textContent = state.sourceType === 'pdf' ? `PDF p.${state.currentPage}` : 'Image';
+}
 
+// --- Mouse events on canvas: create or move selection ---
+canvas.addEventListener('mousedown', (e) => {
+  if (!state.imageLoaded) return;
+  const pos = getCanvasCoordinates(e);
+  
+  state.interaction = {
+    type: 'create',
+    startX: pos.x,
+    startY: pos.y,
+    startSel: { ...state.selection }
+  };
+  
+  state.selection = { x: pos.x, y: pos.y, w: 0, h: 0 };
+  updateSelectionUI();
+  e.preventDefault();
+});
+
+// --- Handle mousedown: resize from that handle ---
+document.querySelectorAll('.handle').forEach(h => {
+  h.addEventListener('mousedown', (e) => {
+    if (!state.imageLoaded) return;
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const pos = getCanvasCoordinates(e);
+    state.interaction = {
+      type: 'resize',
+      handle: h.dataset.handle,
+      startX: pos.x,
+      startY: pos.y,
+      startSel: { ...state.selection }
+    };
+  });
+});
+
+// --- Selection box mousedown: move ---
+selectionBox.addEventListener('mousedown', (e) => {
+  if (!state.imageLoaded || e.target.classList.contains('handle')) return;
+  const pos = getCanvasCoordinates(e);
+  state.interaction = {
+    type: 'move',
+    startX: pos.x,
+    startY: pos.y,
+    startSel: { ...state.selection }
+  };
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!state.imageLoaded) {
+    // Still update mouse coords for status bar
+    if (canvas.style.display !== 'none') {
+      const pos = getCanvasCoordinates(e);
+      mouseCoordsDisplay.textContent = `Mouse: X: ${Math.round(pos.x)}, Y: ${Math.round(pos.y)}`;
+    }
+    return;
+  }
+  
+  const pos = getCanvasCoordinates(e);
+  mouseCoordsDisplay.textContent = `Mouse: X: ${Math.round(pos.x)}, Y: ${Math.round(pos.y)}`;
+  
+  if (!state.interaction) return;
+  
+  const { type, startX, startY, startSel, handle } = state.interaction;
+  const dx = pos.x - startX;
+  const dy = pos.y - startY;
+  
+  if (type === 'create') {
+    let x = Math.min(startX, pos.x);
+    let y = Math.min(startY, pos.y);
+    let w = Math.abs(pos.x - startX);
+    let h = Math.abs(pos.y - startY);
+    
+    if (state.aspectRatio) {
+      // Lock to aspect ratio
+      if (w / h > state.aspectRatio) {
+        w = h * state.aspectRatio;
+      } else {
+        h = w / state.aspectRatio;
+      }
+      // Re-anchor to start
+      x = pos.x < startX ? startX - w : startX;
+      y = pos.y < startY ? startY - h : startY;
+    }
+    
+    state.selection = { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
+  } 
+  else if (type === 'move') {
+    state.selection = {
+      x: Math.round(startSel.x + dx),
+      y: Math.round(startSel.y + dy),
+      w: startSel.w,
+      h: startSel.h
+    };
+    clampSelection();
+  }
+  else if (type === 'resize') {
+    let { x, y, w, h } = startSel;
+    
+    if (handle.includes('e')) w = Math.max(1, startSel.w + dx);
+    if (handle.includes('s')) h = Math.max(1, startSel.h + dy);
+    if (handle.includes('w')) { w = Math.max(1, startSel.w - dx); x = startSel.x + (startSel.w - w); }
+    if (handle.includes('n')) { h = Math.max(1, startSel.h - dy); y = startSel.y + (startSel.h - h); }
+    
+    if (state.aspectRatio) {
+      // Constrain to aspect ratio, anchored to opposite handle
+      if (w / h > state.aspectRatio) {
+        if (handle.includes('w') || handle.includes('e')) {
+          h = w / state.aspectRatio;
+          if (handle.includes('n')) y = startSel.y + (startSel.h - h);
+        } else {
+          w = h * state.aspectRatio;
+          if (handle.includes('w')) x = startSel.x + (startSel.w - w);
+        }
+      } else {
+        if (handle.includes('n') || handle.includes('s')) {
+          w = h * state.aspectRatio;
+          if (handle.includes('w')) x = startSel.x + (startSel.w - w);
+        } else {
+          h = w / state.aspectRatio;
+          if (handle.includes('n')) y = startSel.y + (startSel.h - h);
+        }
+      }
+    }
+    
+    state.selection = { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
+    clampSelection();
+  }
+  
+  updateSelectionUI();
+});
+
+window.addEventListener('mouseup', () => {
+  if (!state.interaction) return;
+  
+  // If create resulted in a tiny box, cancel it
+  if (state.interaction.type === 'create' && (state.selection.w < 3 || state.selection.h < 3)) {
+    state.selection = state.interaction.startSel.w > 0 ? state.interaction.startSel : { x: 0, y: 0, w: 0, h: 0 };
+    updateSelectionUI();
+  }
+  
+  state.interaction = null;
+});
+
+// =============================================================
+// OUTPUT / EXPORT
+// =============================================================
+
+// Format selector
+document.querySelectorAll('.format-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.outputFormat = btn.dataset.format;
+    
+    qualityRow.style.display = (state.outputFormat === 'jpg' || state.outputFormat === 'webp') ? 'block' : 'none';
+    pdfModeRow.style.display = state.outputFormat === 'pdf' ? 'block' : 'none';
+    
+    // If format is PDF and source is image, hide vector option
+    if (state.outputFormat === 'pdf' && state.sourceType !== 'pdf') {
+      vectorPdfOption.style.display = 'none';
+      document.querySelector('input[name="pdfMode"][value="image"]').checked = true;
+      state.pdfMode = 'image';
+    } else if (state.outputFormat === 'pdf') {
+      vectorPdfOption.style.display = 'flex';
+    }
+    
+    if (state.selection.w > 0) cropAndExport();
+  });
+});
+
+qualitySlider.addEventListener('input', () => {
+  state.outputQuality = parseFloat(qualitySlider.value);
+  qualityValue.textContent = Math.round(state.outputQuality * 100) + '%';
+  if (state.selection.w > 0) cropAndExport();
+});
+
+// PDF mode radio styling
+document.querySelectorAll('input[name="pdfMode"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    state.pdfMode = radio.value;
+    document.querySelectorAll('.pdf-mode-option').forEach(opt => {
+      opt.classList.toggle('selected', opt.querySelector('input').checked);
+    });
+    if (state.selection.w > 0) cropAndExport();
+  });
+});
+
+async function cropAndExport() {
+  if (!state.imageLoaded || state.selection.w === 0) return;
+  
+  const sX = Math.round(state.selection.x);
+  const sY = Math.round(state.selection.y);
+  const sW = Math.round(state.selection.w);
+  const sH = Math.round(state.selection.h);
+  
+  try {
+    if (state.outputFormat === 'pdf') {
+      if (state.pdfMode === 'vector' && state.sourceType === 'pdf' && state.pdfBytes) {
+        await exportVectorPdf(sX, sY, sW, sH);
+      } else {
+        await exportImagePdf(sX, sY, sW, sH);
+      }
+    } else {
+      exportRasterImage(sX, sY, sW, sH);
+    }
+  } catch (err) {
+    console.error('Export error:', err);
+    showToast('Export failed: ' + err.message, 'error');
+  }
+}
+
+function exportRasterImage(sX, sY, sW, sH) {
   const tempCanvas = document.createElement('canvas');
-  const sX = Math.round(selection.x);
-  const sY = Math.round(selection.y);
-  const sW = Math.round(selection.w);
-  const sH = Math.round(selection.h);
-
   tempCanvas.width = sW;
   tempCanvas.height = sH;
   const tempCtx = tempCanvas.getContext('2d');
-
   tempCtx.drawImage(canvas, sX, sY, sW, sH, 0, 0, sW, sH);
-
-  const dataURL = tempCanvas.toDataURL('image/png');
+  
+  const mimeType = state.outputFormat === 'jpg' ? 'image/jpeg' : 
+                   state.outputFormat === 'webp' ? 'image/webp' : 'image/png';
+  const ext = state.outputFormat === 'jpg' ? 'jpg' : state.outputFormat === 'webp' ? 'webp' : 'png';
+  const quality = (state.outputFormat === 'jpg' || state.outputFormat === 'webp') ? state.outputQuality : undefined;
+  
+  const dataURL = tempCanvas.toDataURL(mimeType, quality);
   resultImage.src = dataURL;
   downloadLink.href = dataURL;
+  downloadLink.download = `${state.sourceFileName}-cropped-${sW}x${sH}.${ext}`;
   resultArea.classList.add('active');
-  
-  showToast("Image cropped!", "success");
-  // Scroll result into view gently
-  resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
+}
 
-// --- Reset ---
+async function exportImagePdf(sX, sY, sW, sH) {
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = sW;
+  tempCanvas.height = sH;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.fillStyle = '#ffffff';
+  tempCtx.fillRect(0, 0, sW, sH);
+  tempCtx.drawImage(canvas, sX, sY, sW, sH, 0, 0, sW, sH);
+  
+  const dataURL = tempCanvas.toDataURL('image/jpeg', 0.95);
+  
+  // Use pdf-lib to wrap as PDF
+  const { PDFDocument, rgb } = PDFLib;
+  const pdfDoc = await PDFDocument.create();
+  
+  // Convert dataURL to bytes for embedding
+  const imgBytes = dataURLToBytes(dataURL);
+  const img = await pdfDoc.embedJpg(imgBytes);
+  
+  // Page size = image dimensions (in points, 1px = 1pt at 72 DPI)
+  const page = pdfDoc.addPage([sW, sH]);
+  page.drawImage(img, { x: 0, y: 0, width: sW, height: sH });
+  
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  
+  resultImage.src = dataURL;
+  downloadLink.href = url;
+  downloadLink.download = `${state.sourceFileName}-cropped-page${state.currentPage}.pdf`;
+  resultArea.classList.add('active');
+  showToast("PDF created (image-based)", "success");
+}
+
+async function exportVectorPdf(sX, sY, sW, sH) {
+  // Use pdf-lib to set the crop box on the original PDF page
+  // This preserves all vector content, text, fonts within the cropped region
+  const { PDFDocument } = PDFLib;
+  const pdfDoc = await PDFDocument.load(state.pdfBytes);
+  const page = pdfDoc.getPage(state.currentPage - 1);
+  const { width: pdfW, height: pdfH } = page.getSize();
+  
+  // The displayed canvas has rotation applied. Map selection back to PDF coordinates.
+  // Our selection is in displayed source coordinates (canvas with rotation applied).
+  // To get PDF original coords, we need to undo the rotation.
+  const sel = mapSelectionToPdfCoords(sX, sY, sW, sH, pdfW, pdfH);
+  
+  // PDF coordinate system: origin bottom-left, y increases up
+  // CropBox in PDF uses this same system
+  page.setCropBox(sel.x, sel.y, sel.w, sel.h);
+  
+  // Also apply the user's rotation to the page if rotated
+  if (state.rotation !== 0) {
+    // Get current rotation and add ours
+    const currentRotation = page.getRotation().angle || 0;
+    page.setRotation(PDFLib.degrees((currentRotation + state.rotation) % 360));
+  }
+  
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  
+  // Show preview - render the cropped region
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = sW;
+  tempCanvas.height = sH;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.fillStyle = '#ffffff';
+  tempCtx.fillRect(0, 0, sW, sH);
+  tempCtx.drawImage(canvas, sX, sY, sW, sH, 0, 0, sW, sH);
+  const dataURL = tempCanvas.toDataURL('image/png');
+  
+  resultImage.src = dataURL;
+  downloadLink.href = url;
+  downloadLink.download = `${state.sourceFileName}-page${state.currentPage}-cropped.pdf`;
+  resultArea.classList.add('active');
+  showToast("Vector PDF created (text & graphics preserved)", "success");
+}
+
+function mapSelectionToPdfCoords(sX, sY, sW, sH, pdfW, pdfH) {
+  // The displayed canvas size: width = sourceNaturalW/H depending on rotation
+  const rot = state.rotation;
+  let displayW, displayH;
+  if (rot === 90 || rot === 270) {
+    displayW = state.sourceNaturalH;
+    displayH = state.sourceNaturalW;
+  } else {
+    displayW = state.sourceNaturalW;
+    displayH = state.sourceNaturalH;
+  }
+  
+  // Scale selection from display coords to original (un-rotated) source coords
+  // Note: state.sourceCanvas is the rotated version. We need to un-rotate selection to match sourceImage.
+  // For simplicity in this first cut: assume scale between displayed canvas and original PDF.
+  // The canvas (post-rotation) is displayW x displayH. The original PDF page (rendered at 2x) is sourceNaturalW x sourceNaturalH.
+  // Wait, the sourceImage here is the PDF page rendered to image, so sourceNaturalW/H already = 2*pdfW/pdfH (rendered at scale 2.0)
+  // For vector PDF, we need to map back to original PDF coords (pdfW, pdfH)
+  
+  const scaleX = pdfW / displayW;
+  const scaleY = pdfH / displayH;
+  
+  // Selection in displayed (post-rotation) canvas coords -> in original (un-rotated) coords -> in PDF coords
+  // First: undo rotation
+  let unrotX, unrotY, unrotW, unrotH;
+  if (rot === 0) {
+    unrotX = sX; unrotY = sY; unrotW = sW; unrotH = sH;
+  } else if (rot === 90) {
+    // Display is (H, W) of original. Selection (sX, sY) in display -> (displayH - sY - sH, sX) in original
+    unrotX = displayH - sY - sH;
+    unrotY = sX;
+    unrotW = sH;
+    unrotH = sW;
+  } else if (rot === 180) {
+    unrotX = displayW - sX - sW;
+    unrotY = displayH - sY - sH;
+    unrotW = sW;
+    unrotH = sH;
+  } else { // 270
+    unrotX = sY;
+    unrotY = displayW - sX - sW;
+    unrotW = sH;
+    unrotH = sW;
+  }
+  
+  // Now unrotX/unrotY are in displayed canvas coords. Map to PDF coords (original rendered scale 2x).
+  // The sourceImage is rendered at scale 2.0, so sourceNaturalW = 2*pdfW
+  const pdfScaleX = pdfW / state.sourceNaturalW;
+  const pdfScaleY = pdfH / state.sourceNaturalH;
+  
+  let pdfX = unrotX * pdfScaleX;
+  let pdfY_topLeft = unrotY * pdfScaleY;
+  let pdfW_sel = unrotW * pdfScaleX;
+  let pdfH_sel = unrotH * pdfScaleY;
+  
+  // PDF uses bottom-left origin, y increases up
+  // Our pdfY_topLeft is from top. Convert to PDF y: pdfY = pdfH - pdfY_topLeft - pdfH_sel
+  let pdfY = pdfH - pdfY_topLeft - pdfH_sel;
+  
+  // Clamp
+  pdfX = Math.max(0, Math.min(pdfW - 1, pdfX));
+  pdfY = Math.max(0, Math.min(pdfH - 1, pdfY));
+  pdfW_sel = Math.max(1, Math.min(pdfW - pdfX, pdfW_sel));
+  pdfH_sel = Math.max(1, Math.min(pdfH - pdfY, pdfH_sel));
+  
+  return { x: pdfX, y: pdfY, w: pdfW_sel, h: pdfH_sel };
+}
+
+function dataURLToBytes(dataURL) {
+  const base64 = dataURL.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// =============================================================
+// RESET
+// =============================================================
 
 resetBtn.addEventListener('click', () => {
-  fileInput.value = ''; 
-  imageLoaded = false;
+  fileInput.value = '';
+  state.imageLoaded = false;
+  state.sourceType = null;
+  state.sourceImage = null;
+  state.pdfDoc = null;
+  state.pdfBytes = null;
+  state.pdfPageCount = 0;
+  state.rotation = 0;
+  state.selection = { x: 0, y: 0, w: 0, h: 0 };
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   canvas.style.display = 'none';
   placeholderText.style.display = 'block';
-  resetUI();
+  
+  selectionBox.classList.remove('active');
   resultArea.classList.remove('active');
-  cropBtn.disabled = true;
+  
+  transformSection.style.display = 'none';
+  aspectSection.style.display = 'none';
+  pageSection.style.display = 'none';
+  pageStrip.classList.remove('active');
+  pageThumbnails.innerHTML = '';
+  
   resetBtn.disabled = true;
-  mouseCoordsDisplay.textContent = "Mouse: X: 0, Y: 0";
+  imageInfo.textContent = 'No file loaded';
+  mouseCoordsDisplay.textContent = 'Mouse: X: 0, Y: 0';
+  selectionSizeDisplay.textContent = 'Selection: None';
+  
+  showToast('Cleared', 'success');
 });
 
-// Handle Window Resize
+// =============================================================
+// RESIZE HANDLER
+// =============================================================
+
 window.addEventListener('resize', () => {
-  if (imageLoaded && selection.w > 0) {
-    updateSelectionOverlay();
-  }
+  if (state.imageLoaded) updateSelectionUI();
 });
 
-</script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/AVX-Tool-Hub/sw.js');
-  }
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/AVX-Tool-Hub/sw.js');
+}
 </script>
 </body>
 </html>
